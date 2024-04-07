@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoute.js';
+import authRoutes from './routes/authRoute.js';
 dotenv.config();
 
 mongoose.connect(process.env.MONGO)
@@ -17,8 +18,9 @@ const app = express();
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Mounting the userRoutes on '/api/user'
+
 app.use('/api/user', userRoutes);
+app.use('/api/auth', authRoutes);
 
 app.listen(3000, () =>{
     console.log('Server listening on port 3000!');
