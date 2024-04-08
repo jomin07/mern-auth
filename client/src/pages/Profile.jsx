@@ -54,7 +54,7 @@ const Profile = () => {
         request.resource.size < 2 * 1024 * 1024 &&
         request.resource.contentType.matches('image/.*') */}
         
-        <img className='self-center rounded-full h-24 w-24 object-cover cursor-pointer' src= {currentUser.profilePicture} alt="propic" onClick={() => fileRef.current.click()}/>
+        <img className='self-center rounded-full h-24 w-24 object-cover cursor-pointer' src= {formData.profilePicture || currentUser.profilePicture} alt="propic" onClick={() => fileRef.current.click()}/>
 
         <p className='text-sm self-center'>
           {imageError ? (
