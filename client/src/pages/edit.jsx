@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../firebase';
 import { useDispatch } from 'react-redux';
-import { updateUserDataStart, updateUserDataSuccess, updateUserDataFailure } from '../redux/user/userSlice';
+import { updateUserStart, updateUserSuccess, updateUserFailure } from '../redux/user/userSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const EditUser = () => {
@@ -20,6 +20,8 @@ const EditUser = () => {
 
   const { userId } = useParams();
 
+  console.log(userId);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -28,7 +30,6 @@ const EditUser = () => {
           throw new Error('Failed to fetch user data');
         }
         const userData = await response.json();
-        console.log(userData);
         setUser(userData); // Set the user data in state
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -73,8 +74,8 @@ const EditUser = () => {
   const handleSubmit = async (e) =>{
     e.preventDefault();
     try {
-      dispatch(updateUserDataStart());
-      const res = await fetch(`/api/admin/userdata/update/${userId}`, {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/admin/user/update/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -83,25 +84,25 @@ const EditUser = () => {
       });
       const data = await res.json();
       if (data.success === false) {
-        dispatch(updateUserDataFailure(data.message));
+        dispatch(updateUserFailure(data.message));
         return;
       }
-      dispatch(updateUserDataSuccess(data));
-      navigate('/admin');
+      dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
+      navigate('/admin/dashboard');
     } catch (error) {
-      dispatch(updateUserDataFailure(error));
+      dispatch(updateUserFailure(error));
     }
   }
+
   return (
-    
     <div className='max-w-lg mx-auto p-3'>
       <h1 className='text-3xl text-center my-7 font-semibold'>Edit User</h1>
       <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
 
         <input type='file' ref={fileRef} hidden accept='image/*' onChange={(e) => setImage(e.target.files[0])}/>
         
-        <img className='self-center rounded-full h-24 w-24 object-cover cursor-pointer' src= {user && (formData.profilePicture || user.profilePicture)} alt="propic" onClick={() => fileRef.current.click()}/>
+        <img className='self-center rounded-full h-24 w-24 object-cover cursor-pointer' src= {formData.profilePicture || user.profilePicture} alt="propic" onClick={() => fileRef.current.click()}/>
 
         <p className='text-sm self-center'>
           {imageError ? (
@@ -117,9 +118,9 @@ const EditUser = () => {
           )}
         </p>
         
-        <input type="text" defaultValue={user && user.username} placeholder='Username' id='username' className='bg-slate-100 rounded-lg p-3' onChange={handleChange}/>
+        <input type="text" defaultValue={user.username} placeholder='Username' id='username' className='bg-slate-100 rounded-lg p-3' onChange={handleChange}/>
         
-        <input type="email" defaultValue={user && user.email} placeholder='Email' id='email' className='bg-slate-100 rounded-lg p-3' onChange={handleChange}/>
+        <input type="email" defaultValue={user.email} placeholder='Email' id='email' className='bg-slate-100 rounded-lg p-3' onChange={handleChange}/>
 
         <button className='bg-slate-700 text-white uppercase rounded-lg p-3 hover:opacity-95 disabled:opacity-80 mt-2 font-medium'> {loading ? 'Loading...' : 'Update'} </button>
 
