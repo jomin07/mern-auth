@@ -31,7 +31,14 @@ const SignIn = () => {
           return;
         }
         dispatch(signInSuccess(data));
-        navigate('/');
+        // Check if user isAdmin
+        if (data.isAdmin) {
+          // Redirect to admin dashboard
+          navigate('/admin');
+      } else {
+          // Redirect to regular user dashboard
+          navigate('/');
+      }
       } catch (error) {
         dispatch(signInFailure(error));
       }
