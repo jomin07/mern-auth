@@ -9,6 +9,7 @@ import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 import Dashboard from './pages/Dashboard';
 import EditUser from './pages/EditUser';
+import AddUser from './pages/AddUser';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
             <Route element={<AdminRoute />}>
               <Route path="/admin" element={<Dashboard />}/>
               <Route path="/admin/edit-user/:userId" element={<EditUser />}/>
+              <Route path="/admin/add-user" element={<AddUser />}/>
             </Route>
           </Routes>
       </BrowserRouter>
