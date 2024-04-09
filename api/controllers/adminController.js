@@ -75,4 +75,21 @@ export const updateUserData = async (req, res, next) => {
       // If an error occurs, forward it to the error handler middleware
       next(error);
     }
-  };
+};
+
+export const deleteUser = async (req, res, next) => {
+    try {
+      const userId = req.params.id;
+      const deletedUser = await User.findByIdAndDelete(userId);
+  
+      if (!deletedUser) {
+        // If the user with the provided ID does not exist
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.status(200).json({ message: 'User has been deleted', deletedUser });
+    } catch (error) {
+      // Pass the error to the error handling middleware
+      next(error);
+    }
+};

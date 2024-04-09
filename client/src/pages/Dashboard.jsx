@@ -28,9 +28,20 @@ const Dashboard = () => {
   };
 
 
-  const handleDelete = (userId) => {
-    // Implement delete functionality
-    console.log('Delete user with ID:', userId);
+  const handleDelete = async (userId) => {
+    try {
+      const response = await fetch(`/api/admin/delete-user/${userId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+      // Remove the deleted user from the state
+      setUsers(users.filter(user => user._id !== userId));
+      console.log('User deleted successfully');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
   };
 
   const addUser = () =>{
