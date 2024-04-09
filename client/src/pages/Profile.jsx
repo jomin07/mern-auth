@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../firebase';
 import { useDispatch } from 'react-redux';
-import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure } from '../redux/user/userSlice';
+import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signOut } from '../redux/user/userSlice';
 
 const Profile = () => {
   const fileRef = useRef(null);
@@ -89,6 +89,15 @@ const Profile = () => {
     }
   }
 
+  const handleSignOut = async () =>{
+    try {
+      await fetch('/api/auth/signout');
+      dispatch(signOut());
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className='max-w-lg mx-auto p-3'>
       <h1 className='text-3xl text-center my-7 font-semibold'>Profile</h1>
@@ -131,7 +140,7 @@ const Profile = () => {
 
       <div className='mt-5 flex justify-between'>
         <span onClick={handleDeleteAccount} className='text-red-700 font-medium cursor-pointer'>Delete Account</span>
-        <span className='text-red-700 font-medium cursor-pointer'>Sign Out</span>
+        <span onClick={handleSignOut} className='text-red-700 font-medium cursor-pointer'>Sign Out</span>
       </div>
 
       <p className='text-red-700 font-medium mt-3'> {error && 'Something went wrong!'} </p>
