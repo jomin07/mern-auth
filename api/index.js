@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoute.js';
 import authRoutes from './routes/authRoute.js';
+import cookieParser from 'cookie-parser';
 dotenv.config();
 
 mongoose.connect(process.env.MONGO)
@@ -17,6 +18,8 @@ const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+app.use(cookieParser());
 
 
 app.use('/api/user', userRoutes);
