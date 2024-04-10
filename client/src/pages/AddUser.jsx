@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import OAuth from "../components/OAuth";
 
 const AddUser= () => {
   const [ formData, setFormData ] = useState({});
   const [ error, setError ] = useState(false);
+  const [errors, setErrors] = useState({});
   const [ loading, setLoading ] = useState(false);
   const navigate = useNavigate();
 
@@ -14,6 +14,10 @@ const AddUser= () => {
 
   const handleSubmit = async (e) =>{
       e.preventDefault();
+      if (!validateForm()) {
+        return;
+      }
+
       try {
         setLoading(true);
         setError(false);
@@ -37,13 +41,48 @@ const AddUser= () => {
       }
   }
 
+  const validateForm = () => {
+    let errors = {};
+    let isValid = true;
+
+    if (!formData.username) {
+      errors.username = "Username is required";
+      isValid = false;
+    }
+
+    if (!formData.email) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid";
+      isValid = false;
+    }
+
+    if (!formData.password) {
+      errors.password = "Password is required";
+      isValid = false;
+    } else if (formData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters long";
+      isValid = false;
+    }
+
+    setErrors(errors);
+    return isValid;
+  };
+
   return (
     <div className="mx-auto max-w-lg p-3">
       <h1 className="font-semibold text-3xl my-12 text-center">Add User</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input type="text" placeholder="Username" id="username" className="p-3 bg-slate-100 rounded-lg" onChange={handleChange}/>
-        <input type="email" placeholder="Email" id="email" className="p-3 bg-slate-100 rounded-lg" onChange={handleChange}/>
+        {errors.username && <p className="text-red-700 font-medium">{errors.username}</p>}
+
+        <input type="text" placeholder="Email" id="email" className="p-3 bg-slate-100 rounded-lg" onChange={handleChange}/>
+        {errors.email && <p className="text-red-700 font-medium">{errors.email}</p>}
+
         <input type="password" placeholder="Password" id="password" className="p-3 bg-slate-100 rounded-lg" onChange={handleChange}/>
+        {errors.password && <p className="text-red-700 font-medium">{errors.password}</p>}
+
         <button disabled={loading} className="bg-slate-700 hover:opacity-95 p-3 text-white font-medium rounded-lg uppercase disabled:opacity-80"> {loading ? 'Loading' : 'Add User'} </button>
         
       </form>

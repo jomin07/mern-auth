@@ -13,6 +13,8 @@ const Profile = () => {
   const [imageError, setImageError] = useState(false);
   const [formData, setFormData] = useState({});
   const [ updateSuccess, setUpdateSuccess ] = useState(false);
+  const [ errors, setErrors ] = useState({});
+  const [formChanged, setFormChanged] = useState(false);
 
   const { currentUser, loading, error } = useSelector((state) => state.user);
 
@@ -45,12 +47,19 @@ const Profile = () => {
     );
   }
 
-  const handleChange = (e) =>{
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-  }
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+    setFormChanged((prev) => ({ ...prev, [id]: value !== currentUser[id] }));
+  };
+  
 
   const handleSubmit = async (e) =>{
     e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       dispatch(updateUserStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
@@ -71,6 +80,48 @@ const Profile = () => {
       dispatch(updateUserFailure(error));
     }
   }
+
+  const validateForm = () => {
+    let newErrors = {};
+    let isValid = true;
+  
+    // Validate each field based on whether it's changed
+    Object.entries(formData).forEach(([key, value]) => {
+      if (formChanged[key]) {
+        switch (key) {
+          case 'username':
+            if (!value.trim()) {
+              newErrors[key] = 'Username is required';
+              isValid = false;
+            }
+            break;
+          case 'email':
+            if (!value.trim()) {
+              newErrors[key] = 'Email is required';
+              isValid = false;
+            } else if (!/\S+@\S+\.\S+/.test(value.trim())) {
+              newErrors[key] = 'Email is invalid';
+              isValid = false;
+            }
+            break;
+          case 'password':
+            if (!value.trim()) {
+              newErrors[key] = 'Password is required';
+              isValid = false;
+            } else if (value.trim().length < 6) {
+              newErrors[key] = 'Password must be at least 6 characters long';
+              isValid = false;
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    });
+  
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleDeleteAccount = async () =>{
     try {
@@ -129,10 +180,13 @@ const Profile = () => {
         </p>
         
         <input type="text" defaultValue={currentUser.username} placeholder='Username' id='username' className='bg-slate-100 rounded-lg p-3' onChange={handleChange}/>
+        {errors.username && <p className="text-red-700 font-medium">{errors.username}</p>}
         
         <input type="email" defaultValue={currentUser.email} placeholder='Email' id='email' className='bg-slate-100 rounded-lg p-3' onChange={handleChange}/>
+        {errors.email && <p className="text-red-700 font-medium">{errors.email}</p>}
 
         <input type="password" placeholder='Password' id='password' className='bg-slate-100 rounded-lg p-3' onChange={handleChange}/>
+        {errors.password && <p className="text-red-700 font-medium">{errors.password}</p>}
 
         <button className='bg-slate-700 text-white uppercase rounded-lg p-3 hover:opacity-95 disabled:opacity-80 mt-2 font-medium'> {loading ? 'Loading...' : 'Update'} </button>
 
